@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nox Works</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Raleway:wght@100;200;300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+ 
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --rim: #1e1e1e;
+    --mid: #2a2a2a;
+    --highlight: #3d3d3d;
+    --text: #c8c8c8;
+    --text-dim: #555;
+    --white: #f0f0f0;
+    --moon: #e8e8e8;
+  }
+ 
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+    overflow: hidden;
+    cursor: none;
+  }
+ 
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    background: var(--moon);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, opacity 0.3s;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 28px;
+    height: 28px;
+    border: 0.5px solid rgba(200,200,200,0.3);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.25s ease, width 0.2s, height 0.2s, border-color 0.2s;
+  }
+ 
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.4;
+  }
+ 
+  .scene {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+ 
+  /* Emblem */
+  .emblem-wrap {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    margin-bottom: 48px;
+    animation: emblem-in 2.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+ 
+  @keyframes emblem-in {
+    from { opacity: 0; transform: scale(0.88) translateY(12px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+ 
+  .emblem {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background:
+      radial-gradient(ellipse at 50% 20%, #222 0%, #0d0d0d 60%, #080808 100%);
+    border: 1px solid #2a2a2a;
+    box-shadow:
+      0 0 0 6px #111,
+      0 0 0 7px #1f1f1f,
+      0 40px 80px rgba(0,0,0,0.9),
+      inset 0 1px 0 rgba(255,255,255,0.04),
+      inset 0 -2px 8px rgba(0,0,0,0.8);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+ 
+  /* Layered mountain ridges */
+  .emblem svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+ 
+  /* Moon glow */
+  .moon-dot {
+    position: absolute;
+    top: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #f5f5f5 40%, #bbbbbb 100%);
+    box-shadow: 0 0 10px 3px rgba(220,220,220,0.25), 0 0 30px 8px rgba(200,200,200,0.08);
+    z-index: 2;
+    animation: moon-pulse 4s ease-in-out infinite;
+  }
+ 
+  @keyframes moon-pulse {
+    0%, 100% { box-shadow: 0 0 10px 3px rgba(220,220,220,0.25), 0 0 30px 8px rgba(200,200,200,0.08); }
+    50%       { box-shadow: 0 0 14px 5px rgba(220,220,220,0.35), 0 0 40px 12px rgba(200,200,200,0.13); }
+  }
+ 
+  /* Ambient rim light on emblem */
+  .emblem::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 30% 15%, rgba(255,255,255,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+ 
+  /* Wordmark */
+  .wordmark {
+    text-align: center;
+    animation: text-in 2.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+  }
+ 
+  @keyframes text-in {
+    from { opacity: 0; transform: translateY(10px); letter-spacing: 0.5em; }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+ 
+  .brand-name {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 100;
+    font-size: clamp(13px, 2.5vw, 17px);
+    letter-spacing: 0.45em;
+    color: var(--white);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+ 
+  .brand-rule {
+    width: 1px;
+    height: 28px;
+    background: linear-gradient(to bottom, transparent, #3a3a3a, transparent);
+    margin: 10px auto;
+  }
+ 
+  .brand-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-style: italic;
+    font-size: clamp(11px, 1.5vw, 13px);
+    letter-spacing: 0.25em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+ 
+  /* V mark */
+  .v-mark {
+    margin-top: 14px;
+    display: flex;
+    justify-content: center;
+    opacity: 0.35;
+    animation: text-in 3s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both;
+  }
+  .v-mark svg { width: 14px; height: 9px; }
+ 
+  /* Ambient background: subtle circular gradient echo */
+  .ambient {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 50%, rgba(30,30,30,0.4) 0%, transparent 70%);
+    z-index: 0;
+  }
+ 
+  .scene > * { position: relative; z-index: 1; }
+</style>
+</head>
+<body>
+ 
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="ring"></div>
+<div class="ambient"></div>
+ 
+<div class="scene">
+  <div class="emblem-wrap">
+    <div class="emblem">
+      <!-- SVG mountain layers -->
+      <svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="bg-grad" cx="50%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#1c1c1c"/>
+            <stop offset="100%" stop-color="#080808"/>
+          </radialGradient>
+          <clipPath id="circle-clip">
+            <circle cx="110" cy="110" r="108"/>
+          </clipPath>
+        </defs>
+        <circle cx="110" cy="110" r="110" fill="url(#bg-grad)"/>
+        <g clip-path="url(#circle-clip)">
+          <!-- deepest layer: far mountains -->
+          <path d="M-10 145 Q30 100 60 115 Q90 128 110 100 Q130 72 155 108 Q175 128 230 118 L230 220 L-10 220Z"
+                fill="#161616" opacity="0.9"/>
+          <!-- mid layer -->
+          <path d="M-10 160 Q20 130 50 145 Q80 158 105 130 Q125 108 150 138 Q170 155 230 140 L230 220 L-10 220Z"
+                fill="#1a1a1a" opacity="0.95"/>
+          <!-- foreground dunes -->
+          <path d="M-10 178 Q25 160 60 170 Q90 180 115 160 Q138 142 165 168 Q185 180 230 168 L230 220 L-10 220Z"
+                fill="#1e1e1e"/>
+          <!-- near foreground -->
+          <path d="M-10 196 Q30 182 65 190 Q95 197 120 184 Q148 170 175 188 Q200 198 230 188 L230 220 L-10 220Z"
+                fill="#222222"/>
+          <!-- ground -->
+          <path d="M-10 210 Q55 202 110 205 Q165 208 230 202 L230 220 L-10 220Z"
+                fill="#262626"/>
+          <!-- Subtle layer edges highlight -->
+          <path d="M-10 145 Q30 100 60 115 Q90 128 110 100 Q130 72 155 108 Q175 128 230 118"
+                fill="none" stroke="rgba(255,255,255,0.025)" stroke-width="1"/>
+          <path d="M-10 160 Q20 130 50 145 Q80 158 105 130 Q125 108 150 138 Q170 155 230 140"
+                fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+          <path d="M-10 178 Q25 160 60 170 Q90 180 115 160 Q138 142 165 168 Q185 180 230 168"
+                fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.8"/>
+        </g>
+      </svg>
+      <div class="moon-dot"></div>
+    </div>
+  </div>
+ 
+  <div class="wordmark">
+    <div class="brand-name">Nox Works</div>
+    <div class="brand-rule"></div>
+    <div class="brand-sub">Studio</div>
+    <div class="v-mark">
+      <svg viewBox="0 0 14 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polyline points="0,0 7,9 14,0" stroke="#c8c8c8" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+</div>
+ 
+<script>
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+ 
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+ 
+  function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+</script>
+</body>
+</html>
